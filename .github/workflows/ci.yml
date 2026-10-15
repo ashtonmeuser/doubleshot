@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Build and test (macOS arm64)
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          # No external Go modules or go.sum to cache.
+          cache: false
+
+      - name: Verify Apple Silicon runner
+        run: test "$(uname -m)" = arm64
+
+      - name: Build native executable
+        run: make build
+
+      - name: Test
+        run: make test TEST_ARGS=-v
+
+      - name: Race detection
+        run: make race
+
+      - name: Vet native and test builds
+        run: |
+          make vet
+          go vet -tags doubleshot_test ./...
