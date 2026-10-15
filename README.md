@@ -6,6 +6,14 @@ Keep your Apple Silicon Mac awake while a command runs—even with the lid close
 and no external monitor connected. A familiar CLI, no sudo, and no service to
 install.
 
+## Install
+
+With [Homebrew](https://brew.sh) on an Apple Silicon Mac:
+
+```sh
+brew install ashtonmeuser/tap/doubleshot
+```
+
 ## Usage
 
 ```sh
